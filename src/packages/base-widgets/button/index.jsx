@@ -10,7 +10,7 @@ export default {
   key: 'button',
   moduleName: 'baseWidgets',
   label: '按钮',
-  preview: () => <Button type={'primary'}>按钮</Button>,
+  preview: () => <Button>按钮</Button>,
   render: ({ props, block, styles }) => {
     const { registerRef } = useGlobalProperties();
 
