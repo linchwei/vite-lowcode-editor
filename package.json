@@ -12,6 +12,7 @@
 		"@vueuse/core": "^9.6.0",
 		"@vueuse/integrations": "^9.6.0",
 		"ant-design-vue": "^3.2.13",
+		"lodash-es": "^4.17.21",
 		"monaco-editor": "^0.34.1",
 		"pinia": "^2.0.23",
 		"vue": "^3.2.37",
@@ -19,8 +20,10 @@
 		"vuedraggable": "^4.1.0"
 	},
 	"devDependencies": {
+		"@types/lodash-es": "^4.17.6",
 		"@vitejs/plugin-vue": "^3.1.0",
 		"@vitejs/plugin-vue-jsx": "^2.1.1",
+		"@volar-plugins/vetur": "latest",
 		"sass": "^1.55.0",
 		"unplugin-auto-import": "^0.11.5",
 		"unplugin-vue-components": "^0.22.11",

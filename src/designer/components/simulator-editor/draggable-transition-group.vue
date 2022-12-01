@@ -1,11 +1,11 @@
 <script setup>
-import { computed } from 'vue'
-import draggable from 'vuedraggable'
-import { useVModel } from '@vueuse/core'
+import { computed } from 'vue';
+import draggable from 'vuedraggable';
+import { useVModel } from '@vueuse/core';
 
 defineOptions({
   name: 'DraggableTransitionGroup',
-})
+});
 
 const props = defineProps({
   moduleValue: {
@@ -25,18 +25,18 @@ const props = defineProps({
     default: () => ({ name: 'components' }),
   },
   fallbackClass: String,
-})
-const emit = defineEmits(['update:moduleValue', 'update:drag'])
+});
+const emit = defineEmits(['update:moduleValue', 'update:drag']);
 
-const list = useVModel(props, 'moduleValue', emit)
-const isDrag = useVModel(props, 'drag', emit)
+const list = useVModel(props, 'moduleValue', emit);
+const isDrag = useVModel(props, 'drag', emit);
 
 const dragOptions = computed(() => ({
   animation: 200,
   disabled: false,
   scroll: true,
   ghostClass: 'ghost',
-}))
+}));
 </script>
 
 <template>
@@ -87,7 +87,6 @@ const dragOptions = computed(() => ({
 
 .list-group {
   height: 100%;
-  min-height: 40px;
 
   &.isDrag:not(.no-child) :deep(.list-group-item.has-slot) {
     @include showContainerBorder;

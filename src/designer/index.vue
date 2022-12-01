@@ -1,6 +1,7 @@
 <script setup>
-import Header from './components/header/index.vue'
-import LeftAside from './components/left-aside/index.vue'
+import Header from './components/header/index.vue';
+import LeftAside from './components/left-aside/index.vue';
+import SimulatorEditor from './components/simulator-editor/simulator-editor.vue';
 </script>
 
 <template>
@@ -12,7 +13,9 @@ import LeftAside from './components/left-aside/index.vue'
       <a-layout-sider>
         <LeftAside />
       </a-layout-sider>
-      <a-layout-content>Content</a-layout-content>
+      <a-layout-content>
+        <SimulatorEditor />
+      </a-layout-content>
       <a-layout-sider>Sider</a-layout-sider>
     </a-layout>
   </a-layout>
@@ -21,12 +24,15 @@ import LeftAside from './components/left-aside/index.vue'
 <style lang="scss" scoped>
 .lowcode {
   height: 100%;
+
   :deep(.ant-layout-header) {
     background: #ffffff;
   }
+
   :deep(.ant-layout-sider) {
     background: #ffffff;
   }
+
   &-main {
     flex: 1;
   }

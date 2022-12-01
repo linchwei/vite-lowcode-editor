@@ -1,4 +1,3 @@
-import { Button } from 'ant-design-vue';
 import {
   createEditorInputProp,
   createEditorSelectProp,
@@ -10,13 +9,13 @@ export default {
   key: 'button',
   moduleName: 'baseWidgets',
   label: '按钮',
-  preview: () => <Button>按钮</Button>,
+  preview: () => <a-button>按钮</a-button>,
   render: ({ props, block, styles }) => {
     const { registerRef } = useGlobalProperties();
 
     return () => (
       <div style={styles}>
-        <Button ref={(el) => registerRef(el, block._vid)} {...props}></Button>
+        <a-button ref={(el) => registerRef(el, block._vid)} {...props}>  按钮 </a-button>
       </div>
     );
   },

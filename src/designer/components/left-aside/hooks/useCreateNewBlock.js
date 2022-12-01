@@ -1,3 +1,5 @@
+import { generateNanoid } from '@/designer/utils';
+import { useDotProp } from '@/designer/hooks/useDotProp';
 export function createNewBlock(component = {}) {
 	const {
 		moduleName,
