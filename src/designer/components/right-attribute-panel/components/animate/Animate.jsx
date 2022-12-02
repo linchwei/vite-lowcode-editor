@@ -1,7 +1,6 @@
 import { defineComponent, reactive, ref, watchEffect } from 'vue';
-import { ElTabs, ElTabPane, ElRow, ElCol, ElButton, ElSwitch, ElAlert, ElIcon } from 'element-plus';
 import { onClickOutside } from '@vueuse/core';
-import { Plus, CaretRight } from '@element-plus/icons-vue';
+import { PlayCircleOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import { animationTabs } from './animateConfig';
 import styles from './animate.module.scss';
 import { useVisualData } from '@/designer/hooks/useVisualData';
@@ -83,7 +82,7 @@ export const Animate = defineComponent({
     const AddedAnimateList = () => (
       <>
         {currentBlock.value.animations?.map((item, index) => (
-          <ElAlert
+          <a-alert
             key={item.value}
             type={'info'}
             style={{ marginTop: '12px' }}
@@ -98,45 +97,43 @@ export const Animate = defineComponent({
                   </span>
 
                   <span onClick={() => runAnimation(item)} class={'play'} title={'播放'}>
-                    <ElIcon size={20}>
-                      <CaretRight></CaretRight>
-                    </ElIcon>
+                    <PlayCircleOutlined />
                   </span>
                 </div>
               ),
               default: () => (
                 <>
-                  <ElRow gutter={6}>
-                    <ElCol span={8}>
+                  <a-row gutter={6}>
+                    <a-col span={8}>
                       时间：
                       <input v-model={item.duration} type="number" step={0.1} min={0} />
-                    </ElCol>
-                    <ElCol span={8}>
+                    </a-col>
+                    <a-col span={8}>
                       延迟：
                       <input v-model={item.delay} type="number" step={0.1} min={0} />
-                    </ElCol>
-                    <ElCol span={8}>
+                    </a-col>
+                    <a-col span={8}>
                       次数：
                       <input v-model={item.count} type="number" min={0} />
-                    </ElCol>
-                  </ElRow>
-                  <ElSwitch v-model={item.infinite}></ElSwitch> 循环播放
+                    </a-col>
+                  </a-row>
+                  <a-wwitch v-model={item.infinite} /> 循环播放
                 </>
               ),
             }}
-          </ElAlert>
+          </a-alert>
         ))}
       </>
     );
 
     // 可添加的动画列表组件
     const AnimateList = () => (
-      <ElTabs v-model={state.activeName} stretch>
+      <a-tabs v-model={state.activeName}>
         {Object.entries(animationTabs).map(([tabKey, animationBox]) => (
-          <ElTabPane label={animationTabs[tabKey].label} name={tabKey} key={tabKey}>
-            <ElRow gutter={10}>
+          <a-tab-pane tab={animationTabs[tabKey].label} key={tabKey}>
+            <a-row gutter={10}>
               {animationBox.value.map((animateItem) => (
-                <ElCol span={8} key={animateItem.value}>
+                <a-col span={8} key={animateItem.value}>
                   <div
                     class={'animate-item'}
                     onClick={() => addOrChangeAnimate(animateItem)}
@@ -144,35 +141,33 @@ export const Animate = defineComponent({
                   >
                     {animateItem.label}
                   </div>
-                </ElCol>
+                </a-col>
               ))}
-            </ElRow>
-          </ElTabPane>
+            </a-row>
+          </a-tab-pane>
         ))}
-      </ElTabs>
+      </a-tabs>
     );
 
     return () => (
       <div ref={target} class={styles.animate}>
         <div v-show={!state.isAddAnimates}>
-          <ElButton
+          <a-button
             type={'primary'}
+            icon={PlusOutlined}
             disabled={!currentBlock.value.animations}
-            plain
-            icon={Plus}
             onClick={() => (state.isAddAnimates = true)}
           >
             添加动画
-          </ElButton>
-          <ElButton
+          </a-button>
+          <a-button
             type={'primary'}
             disabled={!currentBlock.value.animations?.length}
-            plain
-            icon={CaretRight}
+            icon={PlayCircleOutlined}
             onClick={() => runAnimation(currentBlock.value.animations)}
           >
             播放动画
-          </ElButton>
+          </a-button>
           <AddedAnimateList />
         </div>
         <AnimateList v-show={state.isAddAnimates} />

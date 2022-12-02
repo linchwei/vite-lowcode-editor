@@ -1,8 +1,6 @@
-import { defineComponent, getCurrentInstance, onMounted, PropType, reactive, createApp } from 'vue';
-import { ElButton, ElDialog, ElTable, ElTableColumn, ElInput } from 'element-plus';
+import { defineComponent, getCurrentInstance, onMounted, reactive, createApp } from 'vue';
 import { cloneDeep } from 'lodash-es';
-import { defer } from '@/visual-editor/utils/defer';
-import { VisualEditorProps } from '@/visual-editor/visual-editor.props';
+import { defer } from '@/designer/utils/defer';
 
 const ServiceComponent = defineComponent({
   props: {
@@ -60,48 +58,48 @@ const ServiceComponent = defineComponent({
 
     return () => (
       <>
-        <ElDialog v-model={state.showFlag}>
+        <a-modal v-model={state.showFlag}>
           {{
             default: () => (
               <div>
                 <div>
-                  <ElButton {...({ onClick: methods.add })}>添加</ElButton>
-                  <ElButton {...({ onClick: methods.reset })}>重置</ElButton>
+                  <a-button {...({ onClick: methods.add })}>添加</a-button>
+                  <a-button {...({ onClick: methods.reset })}>重置</a-button>
                 </div>
-                <ElTable data={state.editData}>
-                  <ElTableColumn {...({ type: 'index' })} />
+                <a-table data={state.editData}>
+                  <a-table-column {...({ type: 'index' })} />
                   {state.option.config.table.options.map((item) => (
-                    <ElTableColumn {...({ label: item.label })}>
+                    <a-table-column {...({ label: item.label })}>
                       {{
-                        default: ({ row }) => <ElInput v-model={row[item.field]} />,
+                        default: ({ row }) => <a-input v-model={row[item.field]} />,
                       }}
-                    </ElTableColumn>
+                    </a-table-column>
                   ))}
-                  <ElTableColumn {...({ label: '操作栏' })}>
+                  <a-table-column {...({ label: '操作栏' })}>
                     {{
                       default: ({ $index }) => (
-                        <ElButton
+                        <a-button
                           type="danger"
                           {...({ onClick: () => handler.onDelete($index) })}
                         >
                           删除
-                        </ElButton>
+                        </a-button>
                       ),
                     }}
-                  </ElTableColumn>
-                </ElTable>
+                  </a-table-column>
+                </a-table>
               </div>
             ),
             footer: () => (
               <>
-                <ElButton {...({ onClick: handler.onCancel })}>取消</ElButton>
-                <ElButton type="primary" {...({ onClick: handler.onConfirm })}>
+                <a-button {...({ onClick: handler.onCancel })}>取消</a-button>
+                <a-button type="primary" {...({ onClick: handler.onConfirm })}>
                   确定
-                </ElButton>
+                </a-button>
               </>
             ),
           }}
-        </ElDialog>
+        </a-modal>
       </>
     );
   },

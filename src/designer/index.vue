@@ -1,7 +1,8 @@
 <script setup>
-import Header from './components/header/index.vue';
-import LeftAside from './components/left-aside/index.vue';
-import SimulatorEditor from './components/simulator-editor/simulator-editor.vue';
+import Header from './components/header/index.vue'
+import LeftAside from './components/left-aside/index.vue'
+import RightAttributePanel from './components/right-attribute-panel'
+import SimulatorEditor from './components/simulator-editor/simulator-editor.vue'
 </script>
 
 <template>
@@ -16,7 +17,9 @@ import SimulatorEditor from './components/simulator-editor/simulator-editor.vue'
       <a-layout-content>
         <SimulatorEditor />
       </a-layout-content>
-      <a-layout-sider>Sider</a-layout-sider>
+      <a-layout-sider>
+        <RightAttributePanel />
+      </a-layout-sider>
     </a-layout>
   </a-layout>
 </template>

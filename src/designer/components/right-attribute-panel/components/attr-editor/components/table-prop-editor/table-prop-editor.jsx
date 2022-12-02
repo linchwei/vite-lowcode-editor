@@ -1,6 +1,5 @@
 
-import { defineComponent, SetupContext } from 'vue';
-import { ElButton, ElTag } from 'element-plus';
+import { defineComponent } from 'vue';
 import { useVModel } from '@vueuse/core';
 import { $$tablePropEditor } from './table-prop-edit.service';
 
@@ -24,10 +23,10 @@ export const TablePropEditor = defineComponent({
     return () => (
       <div>
         {(!model.value || model.value.length == 0) && (
-          <ElButton {...({ onClick })}>添加</ElButton>
+          <a-button {...({ onClick })}>添加</a-button>
         )}
         {(model.value || []).map((item) => (
-          <ElTag {...({ onClick })}>{item[props.propConfig.table.showKey]}</ElTag>
+          <a-tag {...({ onClick })}>{item[props.propConfig.table.showKey]}</a-tag>
         ))}
       </div>
     );

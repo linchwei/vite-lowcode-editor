@@ -1,24 +1,27 @@
 import { computed, defineComponent } from 'vue';
-import {
-  ElColorPicker,
-  ElInput,
-  ElOption,
-  ElSelect,
-  ElSwitch,
-  ElCascader,
-  ElInputNumber,
-  ElFormItem,
-  ElTooltip,
-  ElIcon,
-  ExpandTrigger,
-} from 'element-plus';
 import { cloneDeep } from 'lodash-es';
-import { Warning } from '@element-plus/icons-vue';
-import { TablePropEditor, CrossSortableOptionsEditor } from '../../components';
-import { useDotProp } from '@/visual-editor/hooks/useDotProp';
-import { VisualEditorPropsType } from '@/visual-editor/visual-editor.props';
-import { useVisualData } from '@/visual-editor/hooks/useVisualData';
+import { WarningOutlined } from '@ant-design/icons-vue';
+import { CrossSortableOptionsEditor } from "../cross-sortable-options-editor/cross-sortable-options-editor";
+import { TablePropEditor, } from '../table-prop-editor/table-prop-editor';
+import { useDotProp } from '@/designer/hooks/useDotProp';
+import { useVisualData } from '@/designer/hooks/useVisualData';
 
+const VisualEditorPropsType = {
+  /** 输入框 */
+  input: 'input',
+  /** 数字输入框 */
+  inputNumber: 'InputNumber',
+  /** 下拉选择器 */
+  select: 'select',
+  /** 表格 */
+  table: 'table',
+  /** 开关 */
+  switch: 'switch',
+  /** 模型绑定选择器 */
+  modelBind: 'ModelBind',
+  /** 可拖拽项 */
+  crossSortable: 'CrossSortable',
+};
 export const PropConfig = defineComponent({
   props: {
     component: {
@@ -48,16 +51,15 @@ export const PropConfig = defineComponent({
             propObj[prop] = `${propObj[prop]}`;
           }
           return (
-            <ElInput v-model={propObj[prop]} placeholder={propConfig.tips || propConfig.label} />
+            <a-input v-model={propObj[prop]} placeholder={propConfig.tips || propConfig.label} />
           );
         },
         [VisualEditorPropsType.inputNumber]: () => {
           const parseRes = parseFloat(propObj[prop]);
           propObj[prop] = Number.isNaN(parseRes) ? 0 : parseRes;
-          return <ElInputNumber v-model={propObj[prop]} />;
+          return <a-input-mumber v-model={propObj[prop]} />;
         },
-        [VisualEditorPropsType.switch]: () => <ElSwitch v-model={propObj[prop]} />,
-        [VisualEditorPropsType.color]: () => <ElColorPicker v-model={propObj[prop]} />,
+        [VisualEditorPropsType.switch]: () => <a-switch v-model={propObj[prop]} />,
         [VisualEditorPropsType.crossSortable]: () => (
           <CrossSortableOptionsEditor
             v-model={propObj[prop]}
@@ -66,29 +68,28 @@ export const PropConfig = defineComponent({
           />
         ),
         [VisualEditorPropsType.select]: () => (
-          <ElSelect v-model={propObj[prop]} valueKey={'value'} multiple={propConfig.multiple}>
+          <a-select v-model={propObj[prop]} valueKey={'value'} multiple={propConfig.multiple}>
             {propConfig.options?.map((opt) => (
-              <ElOption label={opt.label} style={{ fontFamily: opt.value }} value={opt.value} />
+              <a-select-option style={{ fontFamily: opt.value }} value={opt.value} > {opt.label} </a-select-option>
             ))}
-          </ElSelect>
+          </a-select>
         ),
         [VisualEditorPropsType.table]: () => (
           <TablePropEditor v-model={propObj[prop]} propConfig={propConfig} />
         ),
         [VisualEditorPropsType.modelBind]: () => (
-          <ElCascader
-            clearable={true}
+          <a-cascader
+            allowClear={true}
             props={{
               checkStrictly: true,
               children: 'entitys',
               label: 'name',
               value: 'key',
-              expandTrigger: ExpandTrigger.HOVER,
             }}
             placeholder="请选择绑定的请求数据"
             v-model={propObj[prop]}
             options={[...models.value]}
-          ></ElCascader>
+          ></a-cascader>
         ),
       }[propConfig.type]();
     };
@@ -96,7 +97,7 @@ export const PropConfig = defineComponent({
     return () => {
       return Object.entries(props.component.props ?? {}).map(([propName, propConfig]) => (
         <>
-          <ElFormItem
+          <a-form-item
             key={props.block._vid + propName}
             style={
               propConfig.labelPosition == 'top'
@@ -112,24 +113,22 @@ export const PropConfig = defineComponent({
               label: () => (
                 <>
                   {propConfig.tips && (
-                    <ElTooltip
+                    <a-tooltip
                       placement="left-start"
                       popper-class="max-w-200px"
-                      content={propConfig.tips}
+                      title={propConfig.tips}
                     >
                       <div>
-                        <ElIcon>
-                          <Warning />
-                        </ElIcon>
+                        <WarningOutlined />
                       </div>
-                    </ElTooltip>
+                    </a-tooltip>
                   )}
                   {propConfig.label}
                 </>
               ),
               default: () => renderPropItem(propName, propConfig),
             }}
-          </ElFormItem>
+          </a-form-item>
         </>
       ));
     };

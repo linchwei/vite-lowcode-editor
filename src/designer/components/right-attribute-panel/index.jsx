@@ -1,10 +1,9 @@
 
 import { defineComponent, reactive, watch } from 'vue';
-import { ElTabPane, ElTabs } from 'element-plus';
-import { DArrowLeft, DArrowRight } from '@element-plus/icons-vue';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons-vue';
 import styles from './index.module.scss';
-import { AttrEditor, Animate, PageSetting, EventAction, FormRule } from './components';
-import { useVisualData } from '@/visual-editor/hooks/useVisualData';
+import { AttrEditor, Animate, EventAction, FormRule } from './components';
+import { useVisualData } from '@/designer/hooks/useVisualData';
 
 export default defineComponent({
   name: 'RightAttributePanel',
@@ -29,33 +28,29 @@ export default defineComponent({
       <>
         <div class={[styles.drawer, { [styles.isOpen]: state.isOpen }]}>
           <div class={styles.floatingActionBtn} onClick={() => (state.isOpen = !state.isOpen)}>
-            {state.isOpen ? <DArrowRight /> : <DArrowLeft />}
+            {state.isOpen ? <RightOutlined /> : <LeftOutlined />}
           </div>
           <div class={styles.attrs}>
-            <ElTabs
+            <a-tabs
               v-model={state.activeName}
               type="border-card"
-              stretch={true}
               class={styles.tabs}
             >
-              <ElTabPane label="属性" name="attr">
+              <a-tab-pane tab="属性" name="attr">
                 <AttrEditor />
-              </ElTabPane>
-              <ElTabPane label="动画" name="animate" lazy>
+              </a-tab-pane>
+              <a-tab-pane tab="动画" name="animate" lazy>
                 <Animate />
-              </ElTabPane>
-              <ElTabPane label="事件" name="events">
+              </a-tab-pane>
+              <a-tab-pane tab="事件" name="events">
                 <EventAction />
-              </ElTabPane>
+              </a-tab-pane>
               {currentBlock.value.label?.startsWith('表单') ? (
-                <ElTabPane label="规则" name="form-rule" lazy>
+                <a-tab-pane tab="规则" name="form-rule" lazy>
                   <FormRule />
-                </ElTabPane>
+                </a-tab-pane>
               ) : null}
-              <ElTabPane label="页面设置" name="page-setting">
-                <PageSetting />
-              </ElTabPane>
-            </ElTabs>
+            </a-tabs>
           </div>
         </div>
       </>

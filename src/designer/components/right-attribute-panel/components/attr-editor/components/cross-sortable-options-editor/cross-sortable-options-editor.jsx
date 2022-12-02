@@ -1,22 +1,11 @@
-import { defineComponent, reactive, computed, PropType } from 'vue';
+import { defineComponent, reactive, computed } from 'vue';
 import Draggable from 'vuedraggable';
-import {
-  ElInput,
-  ElCheckboxGroup,
-  ElCheckbox,
-  ElCollapse,
-  ElCollapseItem,
-  ElTabs,
-  ElTabPane,
-  ElForm,
-  ElIcon,
-} from 'element-plus';
 import { useVModel } from '@vueuse/core';
 import { cloneDeep } from 'lodash-es';
-import { Rank, CirclePlus, Remove } from '@element-plus/icons-vue';
+import { PlusCircleFilled, DeleteFilled } from '@ant-design/icons-vue';
 import { PropConfig } from '../prop-config';
-import { isObject } from '@/visual-editor/utils/is';
-import { useVisualData } from '@/visual-editor/hooks/useVisualData';
+import { isObject } from '@/designer/utils/is';
+import { useVisualData } from '@/designer/hooks/useVisualData';
 
 export const CrossSortableOptionsEditor = defineComponent({
   props: {
@@ -81,7 +70,7 @@ export const CrossSortableOptionsEditor = defineComponent({
 
     return () => (
       <div>
-        <ElCheckboxGroup
+        <a-checkbox-group
           modelValue={checkList.value}
           style={{ fontSize: 'inherit' }}
           onChange={onChange}
@@ -104,70 +93,57 @@ export const CrossSortableOptionsEditor = defineComponent({
             {{
               item: ({ element, index }) => (
                 <div class={'flex items-center justify-between'}>
-                  <ElIcon class="handle cursor-move">
-                    <Rank></Rank>
-                  </ElIcon>
                   {isObject(element) ? (
                     <>
-                      <ElCheckbox label={element.value} class={'ml-5px'}>
+                      <a-check-box label={element.value} class={'ml-5px'}>
                         {''}
-                      </ElCheckbox>
+                      </a-check-box>
                       label:
-                      <ElInput
+                      <a-input
                         v-model={element.label}
                         class={'my-12px mx-3px'}
                         style={{ width: '108px' }}
                         size="small"
-                      ></ElInput>
+                      ></a-input>
                       value:
-                      <ElInput
+                      <a-input
                         v-model={element.value}
                         class={'my-12px mx-3px'}
                         style={{ width: '106px' }}
                         size="small"
-                      ></ElInput>
+                      ></a-input>
                     </>
                   ) : (
-                    <ElInput
+                    <a-input
                       v-model={state.list[index]}
                       class={'m-12px'}
                       style={{ width: '270px' }}
                       size="small"
-                    ></ElInput>
+                    ></a-input>
                   )}
                   <div class={'flex flex-col'}>
-                    <ElIcon
-                      class="hover:text-blue-400 cursor-pointer"
-                      onClick={() => incrementOption(index)}
-                    >
-                      <CirclePlus></CirclePlus>
-                    </ElIcon>
-                    <ElIcon
-                      class="hover:text-red-500 cursor-pointer"
-                      onClick={() => state.list.splice(index, 1)}
-                    >
-                      <Remove></Remove>
-                    </ElIcon>
+                    <PlusCircleFilled />
+                    <DeleteFilled />
                   </div>
                 </div>
               ),
             }}
           </Draggable>
-        </ElCheckboxGroup>
+        </a-checkbox-group>
         {props.showItemPropsConfig && (
-          <ElCollapse>
-            <ElCollapseItem title={'选项配置'}>
-              <ElTabs type={'border-card'}>
+          <a-collapse>
+            <a-collapse-item title={'选项配置'}>
+              <a-tabs type={'border-card'}>
                 {state.list.map((item) => (
-                  <ElTabPane label={item.label} key={item.label}>
-                    <ElForm labelPosition={'left'} size="small">
+                  <a-tab-pane tab={item.label} key={item.label}>
+                    <a-form labelPosition={'left'} size="small">
                       <PropConfig component={item.component} block={item.block} />
-                    </ElForm>
-                  </ElTabPane>
+                    </a-form>
+                  </a-tab-pane>
                 ))}
-              </ElTabs>
-            </ElCollapseItem>
-          </ElCollapse>
+              </a-tabs>
+            </a-collapse-item>
+          </a-collapse>
         )}
       </div>
     );

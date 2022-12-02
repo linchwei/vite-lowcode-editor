@@ -1,9 +1,8 @@
 import { defineComponent, computed, watch } from 'vue';
-import { ElForm, ElFormItem, ElPopover, ElRadioGroup, ElRadioButton, ElIcon } from 'element-plus';
-import { Warning } from '@element-plus/icons-vue';
+import { WarningOutlined } from '@ant-design/icons-vue';
 import { PropConfig } from './components/prop-config';
-import { useVisualData } from '@/visual-editor/hooks/useVisualData';
-import { FormatInputNumber } from '@/visual-editor/components/common/format-input-number';
+import { useVisualData } from '@/designer/hooks/useVisualData';
+import { FormatInputNumber } from '@/designer/components/common/format-input-number';
 
 export const AttrEditor = defineComponent({
   setup () {
@@ -48,23 +47,19 @@ export const AttrEditor = defineComponent({
         console.log('props.block:', currentBlock.value);
         content.push(
           <>
-            <ElFormItem label="组件ID" labelWidth={'76px'}>
+            <a-form-item label="组件ID" labelWidth={'76px'}>
               {currentBlock.value._vid}
-              <ElPopover
+              <a-popover
                 width={200}
                 trigger="hover"
                 effect="dark"
                 content={`你可以利用该组件ID。对该组件进行获取和设置其属性，组件可用属性可在控制台输入：$$refs.${currentBlock.value._vid} 进行查看`}
               >
                 {{
-                  reference: () => (
-                    <ElIcon class={'ml-6px'}>
-                      <Warning />
-                    </ElIcon>
-                  ),
+                  reference: () => <WarningOutlined />,
                 }}
-              </ElPopover>
-            </ElFormItem>
+              </a-popover>
+            </a-form-item>
           </>,
         );
         if (component) {
@@ -73,14 +68,14 @@ export const AttrEditor = defineComponent({
             {
               currentBlock.value.showStyleConfig &&
                 content.push(
-                  <ElFormItem label={'组件对齐方式'} labelWidth={'90px'}>
-                    <ElRadioGroup v-model={currentBlock.value.styles.justifyContent}>
-                      <ElRadioButton label="flex-start">{'左对齐'}</ElRadioButton>
-                      <ElRadioButton label="center">{'居中'}</ElRadioButton>
-                      <ElRadioButton label="flex-end">{'右对齐'}</ElRadioButton>
-                    </ElRadioGroup>
-                  </ElFormItem>,
-                  <ElFormItem class={'flex flex-col justify-start'}>
+                  <a-form-item label={'组件对齐方式'} labelWidth={'90px'}>
+                    <a-radio-group v-model={currentBlock.value.styles.justifyContent}>
+                      <a-radio-button value="flex-start">{'左对齐'}</a-radio-button>
+                      <a-radio-button value="center">{'居中'}</a-radio-button>
+                      <a-radio-button value="flex-end">{'右对齐'}</a-radio-button>
+                    </a-radio-group>
+                  </a-form-item>,
+                  <a-form-item class={'flex flex-col justify-start'}>
                     {{
                       label: () => (
                         <div class={'flex justify-between mb-2'}>
@@ -112,7 +107,7 @@ export const AttrEditor = defineComponent({
                         </div>
                       ),
                     }}
-                  </ElFormItem>,
+                  </a-form-item>,
                 );
             }
           }
@@ -120,7 +115,7 @@ export const AttrEditor = defineComponent({
       }
       return (
         <>
-          <ElForm labelPosition={'left'}>{content}</ElForm>
+          <a-form >{content}</a-form>
         </>
       );
     };
