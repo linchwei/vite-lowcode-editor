@@ -1,14 +1,16 @@
 import { defineComponent, reactive, ref, watchEffect } from 'vue';
+import { storeToRefs } from 'pinia';
 import { onClickOutside } from '@vueuse/core';
 import { PlayCircleOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import { animationTabs } from './animateConfig';
 import styles from './animate.module.scss';
-import { useVisualData } from '@/designer/hooks/useVisualData';
+import { useComponentStore } from "@/store/componentStore";
 import { useAnimate } from '@/hooks/useAnimate';
 
 export const Animate = defineComponent({
   setup () {
-    const { currentBlock } = useVisualData();
+    const componentStore = useComponentStore();
+    const { currentComponent } = storeToRefs(componentStore);
     const target = ref();
 
     const state = reactive({
@@ -35,8 +37,8 @@ export const Animate = defineComponent({
      */
     const runAnimation = (animation = []) => {
       let animateEl =
-        (window.$$refs[currentBlock.value._vid]?.$el) ??
-        (window.$$refs[currentBlock.value._vid]);
+        (window.$$refs[currentComponent.value._vid]?.$el) ??
+        (window.$$refs[currentComponent.value._vid]);
 
       animateEl = animateEl?.closest('.list-group-item')?.firstChild;
 
@@ -58,7 +60,7 @@ export const Animate = defineComponent({
      * @param index 要删除的动画的索引
      * @returns
      */
-    const delAnimate = (index) => currentBlock.value.animations?.splice(index, 1);
+    const delAnimate = (index) => currentComponent.value.animations?.splice(index, 1);
 
     /**
      * @description 添加/修改 动画
@@ -68,20 +70,20 @@ export const Animate = defineComponent({
         ...animateItem,
       };
       if (state.changeTargetIndex == -1) {
-        currentBlock.value.animations?.push(animation);
+        currentComponent.value.animations?.push(animation);
       } else {
         // 修改动画
-        currentBlock.value.animations[state.changeTargetIndex] = animation;
+        currentComponent.value.animations[state.changeTargetIndex] = animation;
         state.changeTargetIndex = -1;
       }
       state.isAddAnimates = false;
-      console.log(currentBlock.value.animations, '当前组件的动画');
+      console.log(currentComponent.value.animations, '当前组件的动画');
     };
 
     // 已添加的动画列表组件
     const AddedAnimateList = () => (
       <>
-        {currentBlock.value.animations?.map((item, index) => (
+        {currentComponent.value.animations?.map((item, index) => (
           <a-alert
             key={item.value}
             type={'info'}
@@ -155,16 +157,16 @@ export const Animate = defineComponent({
           <a-button
             type={'primary'}
             icon={PlusOutlined}
-            disabled={!currentBlock.value.animations}
+            disabled={!currentComponent.value.animations}
             onClick={() => (state.isAddAnimates = true)}
           >
             添加动画
           </a-button>
           <a-button
             type={'primary'}
-            disabled={!currentBlock.value.animations?.length}
+            disabled={!currentComponent.value.animations?.length}
             icon={PlayCircleOutlined}
-            onClick={() => runAnimation(currentBlock.value.animations)}
+            onClick={() => runAnimation(currentComponent.value.animations)}
           >
             播放动画
           </a-button>

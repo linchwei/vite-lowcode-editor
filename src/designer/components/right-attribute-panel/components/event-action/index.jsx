@@ -1,8 +1,9 @@
 import { computed, ref, defineComponent, reactive } from 'vue';
+import { storeToRefs } from 'pinia';
 import { cloneDeep } from 'lodash-es';
-import { useVisualData } from '@/designer/hooks/useVisualData';
 import { generateNanoid } from '@/designer/utils';
 import { useModal } from '@/designer/hooks/useModal';
+import { useComponentStore } from "@/store/componentStore";
 
 /**
  * @description 创建一个空的动作处理对象
@@ -25,12 +26,13 @@ const createEmptyAction = () => ({
 
 export const EventAction = defineComponent({
   setup () {
-    const { currentBlock, currentPage, jsonData } = useVisualData();
+    const componentStore = useComponentStore();
+    const { components, currentComponent } = storeToRefs(componentStore);
     /**
      * @description 是否处于编辑状态
      */
     const isEdit = computed(() =>
-      currentBlock.value.actions?.some((item) => item.key === state.ruleForm.key),
+      currentComponent.value.actions?.some((item) => item.key === state.ruleForm.key),
     );
     const ruleFormRef = ref();
 
@@ -44,25 +46,9 @@ export const EventAction = defineComponent({
      */
     const actionOptions = computed(() => [
       {
-        label: '全局',
-        value: 'global',
-        children: Object.keys(jsonData.actions).map((actionKey) => {
-          const item = cloneDeep(jsonData.actions[actionKey]);
-          item.value = actionKey;
-          item.label = item.name;
-          const arrKey = Object.keys(item).find((key) => Array.isArray(item[key]));
-          item.children = (item[arrKey] || []).map((item) => {
-            item.label = item.name;
-            item.value = item.key;
-            return item;
-          });
-          return item;
-        }),
-      },
-      {
         label: '组件',
         value: 'component',
-        children: cloneDeep(currentPage.value.blocks)
+        children: cloneDeep(components.value.blocks)
           .filter((item) => item.actions?.length)
           .map((item) => {
             item.value = item._vid;
@@ -93,7 +79,7 @@ export const EventAction = defineComponent({
      * @description 删除某个动作
      */
     const deleteActionItem = (index) => {
-      currentBlock.value.actions.splice(index, 1);
+      currentComponent.value.actions.splice(index, 1);
     };
     /**
      * @description 删除事件的某个动作
@@ -141,7 +127,7 @@ export const EventAction = defineComponent({
               rules={[{ required: true, message: '请选择事件', trigger: 'change' }]}
             >
               <a-select v-model={state.ruleForm.event} class={'w-full'}>
-                {currentBlock.value.events?.map((eventItem) => (
+                {currentComponent.value.events?.map((eventItem) => (
                   <a-select-option
                     key={eventItem.value}
                     value={eventItem.value}
@@ -211,13 +197,13 @@ export const EventAction = defineComponent({
           return new Promise((resolve, reject) => {
             ruleFormRef.value?.validate((valid) => {
               if (valid) {
-                const index = currentBlock.value.actions.findIndex(
+                const index = currentComponent.value.actions.findIndex(
                   (item) => item.key == state.ruleForm.key,
                 );
                 if (index === -1) {
-                  currentBlock.value.actions.push(state.ruleForm);
+                  currentComponent.value.actions.push(state.ruleForm);
                 } else {
-                  currentBlock.value.actions.splice(index, 1, state.ruleForm);
+                  currentComponent.value.actions.splice(index, 1, state.ruleForm);
                 }
                 state.ruleForm = createEmptyAction();
                 resolve('submit!');
@@ -235,11 +221,11 @@ export const EventAction = defineComponent({
 
     return () => (
       <>
-        <a-button onClick={addActionItem} disabled={!currentBlock.value.actions} type="primary">
+        <a-button onClick={addActionItem} disabled={!currentComponent.value.actions} type="primary">
           添加事件
         </a-button>
 
-        {currentBlock.value.actions?.map((actionItem, index) => (
+        {currentComponent.value.actions?.map((actionItem, index) => (
           <a-card
             key={index}
             class={'mt-10px'}

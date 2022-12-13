@@ -1,28 +1,30 @@
 import { defineComponent, computed, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 import { WarningOutlined } from '@ant-design/icons-vue';
 import { PropConfig } from './components/prop-config';
-import { useVisualData } from '@/designer/hooks/useVisualData';
+import { visualConfig } from '@/config/componentModules';
+import { useComponentStore } from "@/store/componentStore";
 import { FormatInputNumber } from '@/designer/components/common/format-input-number';
 
 export const AttrEditor = defineComponent({
   setup () {
-    const { visualConfig, currentBlock } = useVisualData();
-
+    const componentStore = useComponentStore();
+    const { currentComponent } = storeToRefs(componentStore);
     const compPaddingAttrs = ['paddingTop', 'paddingLeft', 'paddingRight', 'paddingBottom'];
 
     /**
      * @description 监听组件padding值的变化
      */
     watch(
-      compPaddingAttrs.map((item) => () => currentBlock.value.styles?.[item]),
+      compPaddingAttrs.map((item) => () => currentComponent.value.styles?.[item]),
       (val) => {
-        const isSame = val.every((item) => currentBlock.value.styles?.tempPadding == item);
+        const isSame = val.every((item) => currentComponent.value.styles?.tempPadding == item);
         if (isSame || new Set(val).size === 1) {
-          if (Reflect.has(currentBlock.value, 'styles')) {
-            currentBlock.value.styles.tempPadding = val[0];
+          if (Reflect.has(currentComponent.value, 'styles')) {
+            currentComponent.value.styles.tempPadding = val[0];
           }
         } else {
-          currentBlock.value.styles.tempPadding = '';
+          currentComponent.value.styles.tempPadding = '';
         }
       },
     );
@@ -31,45 +33,40 @@ export const AttrEditor = defineComponent({
      * @description 总的组件padding变化时进行的操作
      */
     const compPadding = computed({
-      get: () => currentBlock.value.styles?.tempPadding,
+      get: () => currentComponent.value.styles?.tempPadding,
       set (val) {
-        compPaddingAttrs.forEach((item) => (currentBlock.value.styles[item] = val));
-        currentBlock.value.styles.tempPadding = val;
+        compPaddingAttrs.forEach((item) => (currentComponent.value.styles[item] = val));
+        currentComponent.value.styles.tempPadding = val;
       },
     });
 
     // 表单项
     const FormEditor = () => {
       const content = [];
-      if (currentBlock.value) {
-        const { componentKey } = currentBlock.value;
+      if (currentComponent.value) {
+        const { componentKey } = currentComponent.value;
         const component = visualConfig.componentMap[componentKey];
-        console.log('props.block:', currentBlock.value);
+        console.log('props.block:', currentComponent.value);
         content.push(
           <>
             <a-form-item label="组件ID" labelWidth={'76px'}>
-              {currentBlock.value._vid}
-              <a-popover
-                width={200}
-                trigger="hover"
-                effect="dark"
-                content={`你可以利用该组件ID。对该组件进行获取和设置其属性，组件可用属性可在控制台输入：$$refs.${currentBlock.value._vid} 进行查看`}
+              {currentComponent.value._vid}
+              <a-tooltip
+                title={`你可以利用该组件ID。对该组件进行获取和设置其属性，组件可用属性可在控制台输入：$$refs.${currentComponent.value._vid} 进行查看`}
               >
-                {{
-                  reference: () => <WarningOutlined />,
-                }}
-              </a-popover>
+                <WarningOutlined />
+              </a-tooltip>
             </a-form-item>
           </>,
         );
         if (component) {
           if (component.props) {
-            content.push(<PropConfig component={component} block={currentBlock.value} />);
+            content.push(<PropConfig component={component} block={currentComponent.value} />);
             {
-              currentBlock.value.showStyleConfig &&
+              currentComponent.value.showStyleConfig &&
                 content.push(
                   <a-form-item label={'组件对齐方式'} labelWidth={'90px'}>
-                    <a-radio-group v-model={currentBlock.value.styles.justifyContent}>
+                    <a-radio-group v-model={currentComponent.value.styles.justifyContent}>
                       <a-radio-button value="flex-start">{'左对齐'}</a-radio-button>
                       <a-radio-button value="center">{'居中'}</a-radio-button>
                       <a-radio-button value="flex-end">{'右对齐'}</a-radio-button>
@@ -88,20 +85,20 @@ export const AttrEditor = defineComponent({
                           class={'grid grid-cols-3 gap-2 w-full bg-gray-100 p-20px items-center'}
                         >
                           <FormatInputNumber
-                            v-model={currentBlock.value.styles.paddingTop}
+                            v-model={currentComponent.value.styles.paddingTop}
                             class={'!w-100px col-span-full col-start-2'}
                           />
                           <FormatInputNumber
-                            v-model={currentBlock.value.styles.paddingLeft}
+                            v-model={currentComponent.value.styles.paddingLeft}
                             class={'!w-100px col-span-1'}
                           />
                           <div class={'bg-white col-span-1 h-40px'}></div>
                           <FormatInputNumber
-                            v-model={currentBlock.value.styles.paddingRight}
+                            v-model={currentComponent.value.styles.paddingRight}
                             class={'!w-100px col-span-1'}
                           />
                           <FormatInputNumber
-                            v-model={currentBlock.value.styles.paddingBottom}
+                            v-model={currentComponent.value.styles.paddingBottom}
                             class={'!w-100px col-span-full col-start-2'}
                           />
                         </div>

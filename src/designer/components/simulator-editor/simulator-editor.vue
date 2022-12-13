@@ -1,5 +1,6 @@
 <script lang="jsx" setup>
 import { ref, watchEffect } from 'vue';
+import { storeToRefs } from 'pinia';
 import { cloneDeep } from 'lodash-es';
 import DraggableTransitionGroup from './draggable-transition-group.vue';
 import CompRender from './comp-render';
@@ -7,29 +8,13 @@ import SlotItem from './slot-item.vue';
 import { $$dropdown, DropdownOption } from './utils/dropdown-service';
 import MonacoEditor from '../common/monaco-editor/MonacoEditor';
 import { useGlobalProperties } from '@/hooks/useGlobalProperties';
-import { useVisualData } from '@/designer/hooks/useVisualData';
 import { generateNanoid } from '@/designer/utils';
-// defineOpions({ name: 'SimulatorEditor' });
+import { useComponentStore } from "@/store/componentStore";
 
-const { currentPage, setCurrentBlock } = useVisualData();
 const { globalProperties } = useGlobalProperties();
 const drag = ref(false);
-
-watchEffect(() => {
-  const { bgImage, bgColor } = currentPage.value.config;
-  const bodyStyleStr = `
-      .simulator-editor-content {
-        background-color: ${bgColor};
-        background-image: url(${bgImage});
-      }`;
-  const styleSheets = document.styleSheets[0];
-  const firstCssRule = document.styleSheets[0].cssRules[0];
-  const isExistContent = firstCssRule.cssText.includes('.simulator-editor-content');
-  if (isExistContent) {
-    styleSheets.deleteRule(0);
-  }
-  styleSheets.insertRule(bodyStyleStr);
-});
+const componentStore = useComponentStore();
+const { components, currentComponent } = storeToRefs(componentStore);
 
 //递归实现
 //@leafId  为你要查找的id，
@@ -57,15 +42,15 @@ const findPathByLeafId = (leafId, nodes = [], path = []) => {
 };
 
 // 给当前点击的组件设置聚焦
-const handleSlotsFocus = (block, _vid) => {
-  const slots = block.props?.slots || {};
+const handleSlotsFocus = (component, _vid) => {
+  const slots = component.props?.slots || {};
   if (Object.keys(slots).length > 0) {
     Object.keys(slots).forEach((key) => {
       slots[key]?.children?.forEach((item) => {
         item.focusWithChild = false;
         item.focus = item._vid == _vid;
         if (item.focus) {
-          const arr = findPathByLeafId(_vid, currentPage.value.blocks);
+          const arr = findPathByLeafId(_vid, components);
           arr.forEach((n) => (n.focusWithChild = true));
         }
         if (Object.keys(item.props?.slots || {}).length) {
@@ -78,11 +63,11 @@ const handleSlotsFocus = (block, _vid) => {
 
 // 选择要操作的组件
 const selectComp = (element) => {
-  setCurrentBlock(element);
-  currentPage.value.blocks.forEach((block) => {
-    block.focus = element._vid == block._vid;
-    block.focusWithChild = false;
-    handleSlotsFocus(block, element._vid);
+  componentStore.setCurrentBlock(element);
+  components.value.forEach((component) => {
+    component.focus = element._vid == component._vid;
+    component.focusWithChild = false;
+    handleSlotsFocus(component, element._vid);
     element.focusWithChild = false;
   });
 };
@@ -90,19 +75,19 @@ const selectComp = (element) => {
 /**
  * 删除组件
  */
-const deleteComp = (block, parentBlocks = currentPage.value.blocks) => {
+const deleteComp = (block, parentBlocks = components.value) => {
   console.log(block, 'block');
   const index = parentBlocks.findIndex((item) => item._vid == block._vid);
   if (index != -1) {
     delete globalProperties.$$refs[parentBlocks[index]._vid];
     const delTarget = parentBlocks.splice(index, 1)[0];
     if (delTarget.focus) {
-      setCurrentBlock({});
+      componentStore.setCurrentBlock({});
     }
   }
 };
 
-const onContextmenuBlock = (e, block, parentBlocks = currentPage.value.blocks) => {
+const onContextmenuBlock = (e, block, parentBlocks = components.value) => {
   $$dropdown({
     reference: e,
     content: () => (
@@ -168,7 +153,7 @@ const onContextmenuBlock = (e, block, parentBlocks = currentPage.value.blocks) =
       <div class="simulator-editor-content">
         <DraggableTransitionGroup
           v-model:drag="drag"
-          v-model="currentPage.blocks"
+          v-model="components"
           class="!min-h-680px"
           draggable=".item-drag"
         >

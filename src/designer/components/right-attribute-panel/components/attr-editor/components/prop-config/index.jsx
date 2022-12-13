@@ -1,10 +1,8 @@
-import { computed, defineComponent } from 'vue';
-import { cloneDeep } from 'lodash-es';
+import { defineComponent } from 'vue';
 import { WarningOutlined } from '@ant-design/icons-vue';
 import { CrossSortableOptionsEditor } from "../cross-sortable-options-editor/cross-sortable-options-editor";
 import { TablePropEditor, } from '../table-prop-editor/table-prop-editor';
 import { useDotProp } from '@/designer/hooks/useDotProp';
-import { useVisualData } from '@/designer/hooks/useVisualData';
 
 const VisualEditorPropsType = {
   /** 输入框 */
@@ -34,12 +32,6 @@ export const PropConfig = defineComponent({
     },
   },
   setup (props) {
-    const { jsonData } = useVisualData();
-    /**
-     * @description 模型集合
-     */
-    const models = computed(() => cloneDeep(jsonData.models));
-
     const renderPropItem = (propName, propConfig) => {
       const { propObj, prop } = useDotProp(props.block.props, propName);
 
@@ -76,20 +68,6 @@ export const PropConfig = defineComponent({
         ),
         [VisualEditorPropsType.table]: () => (
           <TablePropEditor v-model={propObj[prop]} propConfig={propConfig} />
-        ),
-        [VisualEditorPropsType.modelBind]: () => (
-          <a-cascader
-            allowClear={true}
-            props={{
-              checkStrictly: true,
-              children: 'entitys',
-              label: 'name',
-              value: 'key',
-            }}
-            placeholder="请选择绑定的请求数据"
-            v-model={propObj[prop]}
-            options={[...models.value]}
-          ></a-cascader>
         ),
       }[propConfig.type]();
     };

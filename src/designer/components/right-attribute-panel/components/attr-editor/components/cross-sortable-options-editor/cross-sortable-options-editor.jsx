@@ -1,11 +1,12 @@
 import { defineComponent, reactive, computed } from 'vue';
+import { storeToRefs } from 'pinia';
 import Draggable from 'vuedraggable';
 import { useVModel } from '@vueuse/core';
 import { cloneDeep } from 'lodash-es';
 import { PlusCircleFilled, DeleteFilled } from '@ant-design/icons-vue';
 import { PropConfig } from '../prop-config';
 import { isObject } from '@/designer/utils/is';
-import { useVisualData } from '@/designer/hooks/useVisualData';
+import { useComponentStore } from "@/store/componentStore";
 
 export const CrossSortableOptionsEditor = defineComponent({
   props: {
@@ -17,8 +18,8 @@ export const CrossSortableOptionsEditor = defineComponent({
     showItemPropsConfig: Boolean, // 是否多选
   },
   setup (props, { emit }) {
-    const { currentBlock } = useVisualData();
-
+    const componentStore = useComponentStore();
+    const { currentComponent } = storeToRefs(componentStore);
     const state = reactive({
       list: useVModel(props, 'modelValue', emit),
       drag: false,
@@ -26,11 +27,11 @@ export const CrossSortableOptionsEditor = defineComponent({
 
     const checkList = computed({
       get: () => {
-        const value = currentBlock.value.props.modelValue;
+        const value = currentComponent.value.props.modelValue;
         return Array.isArray(value) ? value : [...new Set(value?.split(','))];
       },
       set (value) {
-        currentBlock.value.props.modelValue = value;
+        currentComponent.value.props.modelValue = value;
       },
     });
 
@@ -50,8 +51,8 @@ export const CrossSortableOptionsEditor = defineComponent({
       val = val.filter((item) => item !== '');
       val = props.multiple
         ? val
-        : val.filter((n) => !currentBlock.value.props.modelValue?.includes(n));
-      currentBlock.value.props.modelValue = val.join(',');
+        : val.filter((n) => !currentComponent.value.props.modelValue?.includes(n));
+      currentComponent.value.props.modelValue = val.join(',');
     };
 
     /**
